@@ -12,14 +12,14 @@
             if (first == null)
                 return second;
 
-            ParameterExpression param = first.Parameters[0];
+            var parameter = first.Parameters[0];
 
-            SubstExpressionVisitor visitor = new SubstExpressionVisitor();
-            visitor.subst[second.Parameters[0]] = param;
+            var visitor = new SubstExpressionVisitor();
+            visitor.Subst[second.Parameters[0]] = parameter;
 
-            Expression body = Expression.And(first.Body, visitor.Visit(second.Body));
+            var body = Expression.And(first.Body, visitor.Visit(second.Body));
 
-            return Expression.Lambda<Func<T, bool>>(body, param);
+            return Expression.Lambda<Func<T, bool>>(body, parameter);
         }
 
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
@@ -27,14 +27,14 @@
             if (first == null)
                 return second;
 
-            ParameterExpression param = first.Parameters[0];
+            var parameter = first.Parameters[0];
 
-            SubstExpressionVisitor visitor = new SubstExpressionVisitor();
-            visitor.subst[second.Parameters[0]] = param;
+            var visitor = new SubstExpressionVisitor();
+            visitor.Subst[second.Parameters[0]] = parameter;
             
-            Expression body = Expression.Or(first.Body, visitor.Visit(second.Body));
+            var body = Expression.Or(first.Body, visitor.Visit(second.Body));
 
-            return Expression.Lambda<Func<T, bool>>(body, param);
+            return Expression.Lambda<Func<T, bool>>(body, parameter);
         }
 
         public static PropertyInfo GetPropertyInfo<TSource, TProperty>(this Expression<Func<TSource, TProperty>> expression)
@@ -46,15 +46,13 @@
 
     internal class SubstExpressionVisitor : ExpressionVisitor
     {
-        public Dictionary<Expression, Expression> subst = new Dictionary<Expression, Expression>();
+        public Dictionary<Expression, Expression> Subst { get; } = new Dictionary<Expression, Expression>();
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            Expression newValue;
-            if (subst.TryGetValue(node, out newValue))
-            {
+            if (Subst.TryGetValue(node, out var newValue))
                 return newValue;
-            }
+
             return node;
         }
     }

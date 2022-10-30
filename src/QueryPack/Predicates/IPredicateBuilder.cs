@@ -4,6 +4,15 @@
     using System;
     using System.Linq.Expressions;
 
+    public interface IPredicateBuilder<TEntity, TModel>
+        where TEntity : class
+        where TModel : ISearchModel
+    {
+        ICriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
+            Action<IRestriction<TModel>> restriction = default);
+        Expression<Func<TEntity, bool>> Build(TModel model);
+    }
+
     public interface IRestriction<TModel>
          where TModel : ISearchModel
     {
@@ -22,15 +31,6 @@
             Action<IRestriction<TModel>> restriction = default);
         ICriteriaBuilder<TEntity, TModel> Or(Action<IBlockPredicateBuilder<TEntity, TModel>> block);
 
-    }
-
-    public interface IPredicateBuilder<TEntity, TModel>
-        where TEntity : class
-        where TModel : ISearchModel
-    {
-        ICriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestriction<TModel>> restriction = default);
-        Expression<Func<TEntity, bool>> Build(TModel model);
     }
 
     public interface IBlockPredicateBuilder<TEntity, TModel>
