@@ -23,7 +23,7 @@
         {
             private readonly Dictionary<Operator, List<Criteria>> _criterias = new Dictionary<Operator,List<Criteria>>();
 
-            public IBlockCriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestiction<TModel>> restriction = null)
+            public IBlockCriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestriction<TModel>> restriction = null)
             {
                 var criteriaBuilder = new BlockCriteriaBuilder(_criterias);
                 criteriaBuilder.And(predicateFactory, restriction);
@@ -43,7 +43,7 @@
                 _criterias = criterias;
             }
 
-            public IBlockCriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestiction<TModel>> restriction = null)
+            public IBlockCriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestriction<TModel>> restriction = null)
             {
                 var criteria = new Criteria(predicateFactory);
                 if (_criterias.TryGetValue(Operator.And, out var predicates))
@@ -57,7 +57,7 @@
             }
 
             public IBlockCriteriaBuilder<TEntity, TModel> Or(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, 
-                Action<IRestiction<TModel>> restriction = null)
+                Action<IRestriction<TModel>> restriction = null)
             {
                 var criteria = new Criteria(predicateFactory);
                 if (_criterias.TryGetValue(Operator.And, out var predicates))
@@ -80,7 +80,7 @@
                 _criterias = criterias;
             }
 
-            public ICriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestiction<TModel>> restriction = null)
+            public ICriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestriction<TModel>> restriction = null)
             {
                 var criteria = new Criteria(predicateFactory);
                 if (_criterias.TryGetValue(Operator.And, out var predicates))
@@ -106,7 +106,7 @@
                 return this;
             }
 
-            public ICriteriaBuilder<TEntity, TModel> Or(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestiction<TModel>> restriction = null)
+            public ICriteriaBuilder<TEntity, TModel> Or(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory, Action<IRestriction<TModel>> restriction = null)
             {
                 var criteria = new Criteria(predicateFactory);
                 if (_criterias.TryGetValue(Operator.Or, out var criterias))
@@ -133,7 +133,7 @@
             }
         }
 
-        internal class Criteria : IRestiction<TModel>
+        internal class Criteria : IRestriction<TModel>
         {
             private Func<TModel, bool> _restriction;
             private readonly Func<TModel, Expression<Func<TEntity, bool>>> _predicateFactory;
@@ -161,7 +161,7 @@
         }
 
         public ICriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default)
+            Action<IRestriction<TModel>> restriction = default)
         {
             var criteriaBuilder = new CriteriaBuilder(_criterias);
             criteriaBuilder.And(predicateFactory, restriction);

@@ -4,7 +4,7 @@
     using System;
     using System.Linq.Expressions;
 
-    public interface IRestiction<TModel>
+    public interface IRestriction<TModel>
          where TModel : ISearchModel
     {
         void When(Func<TModel, bool> validation);
@@ -15,11 +15,11 @@
         where TModel : ISearchModel
     {
         ICriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
         ICriteriaBuilder<TEntity, TModel> And(Action<IBlockPredicateBuilder<TEntity, TModel>> block);
 
         ICriteriaBuilder<TEntity, TModel> Or(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
         ICriteriaBuilder<TEntity, TModel> Or(Action<IBlockPredicateBuilder<TEntity, TModel>> block);
 
     }
@@ -29,7 +29,7 @@
         where TModel : ISearchModel
     {
         ICriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
         Expression<Func<TEntity, bool>> Build(TModel model);
     }
 
@@ -38,7 +38,7 @@
         where TModel : ISearchModel
     {
         IBlockCriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
     }
 
     public interface IBlockCriteriaBuilder<TEntity, TModel>
@@ -46,8 +46,8 @@
         where TModel : ISearchModel
     {
         IBlockCriteriaBuilder<TEntity, TModel> And(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
         IBlockCriteriaBuilder<TEntity, TModel> Or(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
-            Action<IRestiction<TModel>> restriction = default);
+            Action<IRestriction<TModel>> restriction = default);
     }
 }
