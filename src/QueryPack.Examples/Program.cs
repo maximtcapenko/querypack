@@ -2,7 +2,10 @@
 
 using QueryPack.Examples.Predicates;
 
-var example = new SimplePredicateExample();
-example.Run();
+var simpleExample = new SimplePredicateExample();
+simpleExample.Run();
+
+var configExample = new SearchConfigurationExample();
+configExample.Run();
 
 Console.ReadKey();
