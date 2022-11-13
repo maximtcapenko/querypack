@@ -1,4 +1,4 @@
-﻿namespace QueryPack.Projections
+﻿namespace QueryPack.Projections.Infrastructure
 {
     using System;
     using System.Reflection;
