@@ -1,4 +1,4 @@
-﻿namespace QueryPack.Projections
+﻿namespace QueryPack.Projections.Infrastructure
 {
     using Extensions;
     using System;
@@ -52,12 +52,18 @@
             return _typeCache[key];
         }
 
-        private TypeBuilder GetTypeBuilder(string typeName)
+        private TypeBuilder GetTypeBuilder(string typeName, params Type[] interfaces)
         {
             var typeBuilder = _moduleBuilder.DefineType(typeName, TypeAttributes.Public |
                 TypeAttributes.Class | TypeAttributes.Serializable);
             typeBuilder.DefineDefaultConstructor(MethodAttributes.Public |
                 MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
+            
+            foreach (var @interface in interfaces)
+            {
+                typeBuilder.AddInterfaceImplementation(@interface);
+            }
+
             return typeBuilder;
         }
     }
