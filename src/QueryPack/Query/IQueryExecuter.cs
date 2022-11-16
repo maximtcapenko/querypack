@@ -1,16 +1,23 @@
 ﻿namespace QueryPack.Query
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    public interface IProjectionBuilder
+    public interface IQueryExecutionContext
     {
-        Task<IEnumerable<TProjection>> ExecuteQueryAsync<TEntity, TProjection>(IQueryable<TEntity> source);
+        IServiceProvider ServiceProvider { get; }
     }
-    
+
     public interface IQueryExecuter
     {
-        Task<IEnumerable<IQueryResult>> ExecuteCollectionAsync();
+        Task<IEnumerable<object>> ExecuteCollectionAsync(IQueryExecutionContext context);
+    }
+
+    public interface IQueryExecuter<TEntity>
+    {
+        Task<IEnumerable<TProjection>> ExecuteQueryAsync<TProjection>(Expression<Func<TEntity, TProjection>> projection)
+         where TProjection : class;
     }
 }

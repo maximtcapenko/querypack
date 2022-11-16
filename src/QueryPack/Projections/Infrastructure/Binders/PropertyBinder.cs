@@ -10,17 +10,19 @@
 
     internal class PropertyBinder<TEntity> : IPropertyBinder<TEntity> where TEntity : class
     {
-        Type _anonymousType;
-        ParameterExpression _sourceParameter = Expression.Parameter(typeof(TEntity), "e");
-        ParameterExpression _destinationParameter;
-        Dictionary<string, IMemberValueBinder> _members = new Dictionary<string, IMemberValueBinder>();
-        SubstExpressionVisitor _visitor;
+        private readonly Type _anonymousType;
+        private readonly ParameterExpression _sourceParameter = Expression.Parameter(typeof(TEntity), "e");
+        private readonly ParameterExpression _destinationParameter;
+        private readonly Dictionary<string, IMemberValueBinder> _members = new Dictionary<string, IMemberValueBinder>();
+        private readonly SubstExpressionVisitor _visitor;
+        private readonly Type _queryExecuterType;
 
-        public PropertyBinder(Type anonymousType)
+        public PropertyBinder(Type anonymousType, Type queryExecuterType)
         {
             _anonymousType = anonymousType;
             _destinationParameter = Expression.Parameter(_anonymousType, "e");
             _visitor = new SubstExpressionVisitor(_sourceParameter);
+            _queryExecuterType = queryExecuterType;
         }
 
         public void Bind<TProperty>(Expression<Func<TEntity, TProperty>> property)
@@ -68,18 +70,15 @@
             var factory = GetType().GetMethod(nameof(Create), BindingFlags.NonPublic | BindingFlags.Instance);
             var generic = factory.MakeGenericMethod(_anonymousType);
 
-            return (IQueryExecuter)generic.Invoke(this, new object[] { init, _sourceParameter });
+            return (IQueryExecuter)generic.Invoke(this, new object[] { init, _sourceParameter, _queryExecuterType });
         }
 
         private IQueryExecuter Create<TProjection>(MemberInitExpression memberInit, ParameterExpression parameter,
-            IQueryable<TEntity> queryable)
-            where TProjection : class, IQueryResult
+            Type queryExecuter)
+            where TProjection : class
         {
             var projection = Expression.Lambda<Func<TEntity, TProjection>>(memberInit, parameter);
-            var executer = new DefaultQueryExecuter<TEntity, TProjection>(projection, queryable);
-
-            return executer;
+            return new DefaultQueryExecuter<TEntity, TProjection>(projection, queryExecuter);
         }
     }
-
 }

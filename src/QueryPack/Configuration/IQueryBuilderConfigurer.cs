@@ -5,9 +5,8 @@
 
     public interface IQueryBuilderConfigurer<TEntity> where TEntity : class
     {
-        IQueryBuilderConfigurer<TEntity> WithSource<TSource>() where TSource : class, 
-            IQueryDataSource<TEntity>;
-        IQueryBuilderConfigurer<TEntity> WithId(string id);
-        IQueryBuilderConfigurer<TEntity> WithProjection(Action<IProjectionBuilderConfigurer<TEntity>> configurer);
+        IQueryBuilderConfigurer<TEntity> WithQueryExecuter<TSource>(string queryId, 
+        Action<IProjectionBuilderConfigurer<TEntity>> configurer) where TSource : class, 
+            IQueryExecuter<TEntity>;
     }
 }

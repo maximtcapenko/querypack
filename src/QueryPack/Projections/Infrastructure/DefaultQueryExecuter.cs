@@ -3,26 +3,28 @@
     using Query;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     internal class DefaultQueryExecuter<TEntity, TProjection> : IQueryExecuter
         where TEntity : class
-        where TProjection : class, IQueryResult
+        where TProjection : class
     {
         private readonly Expression<Func<TEntity, TProjection>> _selector;
-        private readonly IQueryable<TEntity> _queriable;
+        private readonly Type _executerType;
 
-        public DefaultQueryExecuter(Expression<Func<TEntity, TProjection>> selector, IQueryable<TEntity> queriable)
+        public DefaultQueryExecuter(Expression<Func<TEntity, TProjection>> selector, 
+        Type executerType)
         {
-            _queriable = queriable;
+            _executerType = executerType;
             _selector = selector;
         }
 
-        public async Task<IEnumerable<IQueryResult>> ExecuteCollectionAsync()
+        public async Task<IEnumerable<object>> ExecuteCollectionAsync(IQueryExecutionContext context)
         {
-            return await Task.FromResult(_queriable.Select(_selector).AsEnumerable());
+            var executer = context.ServiceProvider.GetService(_executerType) as IQueryExecuter<TEntity>;
+            var result = await executer.ExecuteQueryAsync<TProjection>(_selector);
+            return result;
         }
     }
 }

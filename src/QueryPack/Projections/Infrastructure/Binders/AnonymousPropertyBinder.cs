@@ -9,9 +9,15 @@
 
     internal class AnonymousPropertyBinder<TEntity> : IPropertyBinder<TEntity> where TEntity : class
     {
-        private List<IBinderInvoker<TEntity>> _binderInvokers = new List<IBinderInvoker<TEntity>>();
-        private Dictionary<string, IMemberBuilder> _members = new Dictionary<string, IMemberBuilder>();
-        private SubstExpressionVisitor _visitor = new SubstExpressionVisitor(Expression.Parameter(typeof(TEntity), "e"));
+        private readonly List<IBinderInvoker<TEntity>> _binderInvokers = new List<IBinderInvoker<TEntity>>();
+        private readonly Dictionary<string, IMemberBuilder> _members = new Dictionary<string, IMemberBuilder>();
+        private readonly SubstExpressionVisitor _visitor = new SubstExpressionVisitor(Expression.Parameter(typeof(TEntity), "e"));
+        private readonly Type _queryExecuterType;
+
+        public AnonymousPropertyBinder(Type queryExecuterType)
+        {
+            _queryExecuterType = queryExecuterType;
+        }
 
         class InternalBinderInvoker<TProperty> : IBinderInvoker<TEntity>
         {
@@ -71,7 +77,7 @@
             }
 
             var type = typeBuilder.CreateType();
-            var _internalBinder = new PropertyBinder<TEntity>(type);
+            var _internalBinder = new PropertyBinder<TEntity>(type, _queryExecuterType);
 
             foreach (var invoker in _binderInvokers) 
                 invoker.Bind(_internalBinder);
