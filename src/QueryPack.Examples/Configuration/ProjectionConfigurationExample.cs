@@ -28,7 +28,8 @@
             {
                 configurer.WithQueryExecuter<UserQueryExecuter>("search.all",
                                 p => p.Property(e => e.Name)
-                                      .Property(e => e.Email));
+                                      .Property(e => e.Email)
+                                      .Property("RoleName", e => e.Role.Name));
             }
         }
 
@@ -38,9 +39,14 @@
             {
                 new User
                 {
-                      Name = "first"
+                      Name = "first",
+                      Role = new Role
+                      {
+                          Name = "test role"
+                      }
                 }
             };
+
             public Task<IEnumerable<TProjection>> ExecuteQueryAsync<TProjection>(Expression<Func<User, TProjection>> projection)
                 where TProjection : class
             {

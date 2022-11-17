@@ -8,7 +8,7 @@
     using System.Reflection;
     using System.Reflection.Emit;
 
-    internal class AnonymousTypeBuilder
+    internal class AnonymousTypeBuilder : ITypeBuilder
     {
         private static AssemblyName _assemblyName = new AssemblyName() { Name = "AnonymousTypes" };
         private static ModuleBuilder _moduleBuilder = null;

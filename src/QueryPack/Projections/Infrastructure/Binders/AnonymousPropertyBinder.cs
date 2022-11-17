@@ -19,6 +19,7 @@
             _queryExecuterType = queryExecuterType;
         }
 
+        #region invokers
         class InternalBinderInvoker<TProperty> : IBinderInvoker<TEntity>
         {
             private readonly Expression<Func<TEntity, TProperty>> _property;
@@ -32,17 +33,33 @@
                 => propertyBinder.Bind(_property);
         }
 
+        class InternalProjectionBinderInvoker<TProperty> : IBinderInvoker<TEntity>
+        {
+            private readonly string _name;
+            private readonly Expression<Func<TEntity, TProperty>> _property;
+
+            public InternalProjectionBinderInvoker(string name, Expression<Func<TEntity, TProperty>> property)
+            {
+                _name = name;
+                _property = property;
+            }
+
+            public void Bind(IPropertyBinder<TEntity> propertyBinder)
+                 => propertyBinder.Bind(_name, _property);
+        }
+        #endregion
+
         public void Bind<TProperty>(Expression<Func<TEntity, TProperty>> property)
         {
-            // store property for future usage
-            _binderInvokers.Add(new InternalBinderInvoker<TProperty>(property));
-
             var path = property.GetMemberPath();
 
             // detect nested properties
             var paths = path.Split('.');
 
             if (paths.Length > 2) throw new NotSupportedException();
+
+            // store property for future usage
+            _binderInvokers.Add(new InternalBinderInvoker<TProperty>(property));
 
             if (paths.Length == 1 && !_members.ContainsKey(paths[0]))
                 _members[paths[0]] = new SingleMemberBuilder(_visitor.Visit(property.Body) as MemberExpression);
@@ -68,6 +85,19 @@
             }
         }
 
+        public void Bind<TProperty>(string name, Expression<Func<TEntity, TProperty>> property)
+        {
+            // should be primitive or string
+            if (!(typeof(TProperty).IsPrimitive || typeof(TProperty) == typeof(string)))
+                throw new NotSupportedException();
+
+            _binderInvokers.Add(new InternalProjectionBinderInvoker<TProperty>(name, property));
+            var path = property.GetMemberPath();
+
+            _members[name] = new RuntimeMemberBuilder(name, typeof(TProperty));
+
+        }
+
         public IQueryExecuter GetQueryExecuter()
         {
             var typeBuilder = AnonymousTypeBuilder.GetBuilder();
@@ -79,7 +109,7 @@
             var type = typeBuilder.CreateType();
             var _internalBinder = new PropertyBinder<TEntity>(type, _queryExecuterType);
 
-            foreach (var invoker in _binderInvokers) 
+            foreach (var invoker in _binderInvokers)
                 invoker.Bind(_internalBinder);
 
             return _internalBinder.GetQueryExecuter();

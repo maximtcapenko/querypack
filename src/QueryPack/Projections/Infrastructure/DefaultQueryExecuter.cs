@@ -23,7 +23,7 @@
         public async Task<IEnumerable<object>> ExecuteCollectionAsync(IQueryExecutionContext context)
         {
             var executer = context.ServiceProvider.GetService(_executerType) as IQueryExecuter<TEntity>;
-            var result = await executer.ExecuteQueryAsync<TProjection>(_selector);
+            var result = await executer?.ExecuteQueryAsync<TProjection>(_selector);
             return result;
         }
     }

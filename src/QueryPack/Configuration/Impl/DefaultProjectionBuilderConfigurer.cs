@@ -19,5 +19,11 @@
             _propertyBinder.Bind(property);
             return this;
         }
+
+        public IProjectionBuilderConfigurer<TEntity> Property<TProperty>(string name, Expression<Func<TEntity, TProperty>> property)
+        {
+            _propertyBinder.Bind(name, property);
+            return this;
+        }
     }
 }

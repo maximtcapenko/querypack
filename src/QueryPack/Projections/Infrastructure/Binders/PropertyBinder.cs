@@ -56,6 +56,13 @@
             }
         }
 
+        public void Bind<TProperty>(string name, Expression<Func<TEntity, TProperty>> property)
+        {
+            var sourceExpression = _visitor.Visit(property.Body) as MemberExpression;
+            var destinationExpression = Expression.PropertyOrField(_destinationParameter, name);
+            _members[name] = new ProjectionMemberValueBinder(sourceExpression, destinationExpression);
+        }
+
         public IQueryExecuter GetQueryExecuter()
         {
             var @new = Expression.New(_anonymousType);

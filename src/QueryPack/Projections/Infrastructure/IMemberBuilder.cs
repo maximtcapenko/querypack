@@ -2,6 +2,6 @@
 {
     internal interface IMemberBuilder
     {
-        void Build(AnonymousTypeBuilder typeBuilder);
+        void Build(ITypeBuilder typeBuilder);
     }
 }

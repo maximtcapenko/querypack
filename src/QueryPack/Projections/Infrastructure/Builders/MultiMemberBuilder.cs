@@ -7,8 +7,8 @@
 
     internal class MultiMemberBuilder : IMemberBuilder
     {
-        private MemberExpression _parentMemberExpression;
-        private List<MemberExpression> _memberExpressions;
+        private readonly MemberExpression _parentMemberExpression;
+        private readonly List<MemberExpression> _memberExpressions;
 
         public MultiMemberBuilder(MemberExpression memberExpression)
         {
@@ -22,7 +22,7 @@
                 _memberExpressions.Add(memberExpression);
         }
 
-        public void Build(AnonymousTypeBuilder typeBuilder)
+        public void Build(ITypeBuilder typeBuilder)
         {
             var propertyInfo = _parentMemberExpression.Member as PropertyInfo; // TODO: fix it
             var type = CreateType(_memberExpressions);
