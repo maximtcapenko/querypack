@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using QueryPack.Examples.Configuration;
+using QueryPack.Examples.Projections;
 using QueryPack.Examples.Predicates;
 
 var simpleExample = new SimplePredicateExample();

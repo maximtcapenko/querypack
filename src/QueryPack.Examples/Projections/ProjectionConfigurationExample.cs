@@ -1,8 +1,8 @@
-﻿namespace QueryPack.Examples.Configuration
+﻿namespace QueryPack.Examples.Projections
 {
-    using QueryPack.Configuration;
-    using QueryPack.Configuration.Impl;
-    using QueryPack.Query;
+    using Configuration;
+    using Configuration.Impl;
+    using Query;
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Linq;
