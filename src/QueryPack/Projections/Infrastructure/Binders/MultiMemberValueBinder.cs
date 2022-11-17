@@ -8,8 +8,8 @@
 
     internal class MultiMemberValueBinder : IMemberValueBinder
     {
-        private MemberExpression _parentMemberExpression;
-        private List<(MemberExpression, MemberExpression)> _memberExpressions;
+        private readonly MemberExpression _parentMemberExpression;
+        private readonly List<(MemberExpression, MemberExpression)> _memberExpressions;
 
         public MultiMemberValueBinder(MemberExpression memberExpression)
         {

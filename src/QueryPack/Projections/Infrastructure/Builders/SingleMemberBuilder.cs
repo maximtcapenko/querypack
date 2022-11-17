@@ -5,14 +5,14 @@
 
     internal class SingleMemberBuilder : IMemberBuilder
     {
-        private MemberExpression _memberExpression;
+        private readonly MemberExpression _memberExpression;
 
         public SingleMemberBuilder(MemberExpression memberExpression)
         {
             _memberExpression = memberExpression;
         }
 
-        public void Build(AnonymousTypeBuilder typeBuilder)
+        public void Build(ITypeBuilder typeBuilder)
         {
             var property = _memberExpression.Member as PropertyInfo;
             typeBuilder.DefineField(property.Name, property.PropertyType);

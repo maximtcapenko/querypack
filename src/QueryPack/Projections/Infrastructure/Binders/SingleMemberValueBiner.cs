@@ -5,8 +5,8 @@
 
     internal class SingleMemberValueBiner : IMemberValueBinder
     {
-        private MemberExpression _sourceExpression;
-        private MemberExpression _destinationExpression;
+        private readonly MemberExpression _sourceExpression;
+        private readonly MemberExpression _destinationExpression;
 
         public SingleMemberValueBiner(MemberExpression sourceExpression, MemberExpression destinationExpression)
         {
