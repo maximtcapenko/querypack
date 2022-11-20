@@ -26,10 +26,11 @@
                    .Or(b => b.With(m => e => e.Email.StartsWith(m.UserEmail))
                              .And(m => e => e.Name == "test"));
 
-            var predicate = builder.Build(new SearchUser { UserName = "jhon", UserEmail = "jhon@email.com" });
+            var predicate = builder.Build();
+            var expression = predicate.Get(new SearchUser { UserName = "jhon", UserEmail = "jhon@email.com" });
 
             Console.WriteLine($"Run example of {nameof(SimplePredicateExample)}");
-            Console.WriteLine(predicate);
+            Console.WriteLine(expression);
             Console.WriteLine("end");
         }
     }

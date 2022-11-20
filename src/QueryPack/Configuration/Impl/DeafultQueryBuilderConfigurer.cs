@@ -14,14 +14,20 @@
         new Dictionary<string, AnonymousPropertyBinder<TEntity>>();
 
         public IQueryBuilderConfigurer<TEntity> WithQueryExecuter<TSource>(string queryId, 
-        Action<IProjectionBuilderConfigurer<TEntity>> configurer) where TSource : class,
+        Action<IProjectionBuilderConfigurer<TEntity>> projectioncConfigurer,
+        Action<IPredicateBuilderConfigurer<TEntity>> predicateConfigurer = null) where TSource : class,
             IQueryExecuter<TEntity>
         {
-            var projectionBuilder = new AnonymousPropertyBinder<TEntity>(typeof(TSource));
-            var instance = new DefaultProjectionBuilderConfigurer<TEntity>(projectionBuilder);
-            configurer?.Invoke(instance);
+            var projectionBinder = new AnonymousPropertyBinder<TEntity>(typeof(TSource));
 
-            _queryProviders[queryId] = projectionBuilder;
+            var projectionConfigurerInstance = new DefaultProjectionBuilderConfigurer<TEntity>(projectionBinder);
+            projectioncConfigurer?.Invoke(projectionConfigurerInstance);
+
+            var predicateConfigurerInstance = new DefaultPredicateBuilderConfigurer<TEntity>();
+            predicateConfigurer?.Invoke(predicateConfigurerInstance);
+            projectionBinder.AddPredicates(predicateConfigurerInstance.Predicates);
+
+            _queryProviders[queryId] = projectionBinder;
             return this;
         }
 

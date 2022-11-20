@@ -30,13 +30,14 @@
         public void Run()
         {
             var searchBuilder = new UserSearchBuilder();
-            var predicate = searchBuilder.Build(new SearchUser
+            var predicate = searchBuilder.Build();
+            var expression = predicate.Get(new SearchUser
             {
                 UserName = "jhon"
             });
 
             Console.WriteLine($"Run example of {nameof(SearchConfigurationExample)}");
-            Console.WriteLine(predicate);
+            Console.WriteLine(expression);
             Console.WriteLine("end");
         }
     }
