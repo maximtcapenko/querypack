@@ -1,28 +1,35 @@
 ﻿namespace QueryPack.Projections.Infrastructure.Binders
 {
     using Extensions;
-    using QueryPack.Query;
+    using Query;
+    using Query.Impl;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Utils;
 
     internal class PropertyBinder<TEntity> : IPropertyBinder<TEntity> where TEntity : class
     {
+        private static ConcurrentDictionary<Type, GenericMethodWrapper<IQueryExecuter>> _methodCache =
+         new ConcurrentDictionary<Type, GenericMethodWrapper<IQueryExecuter>>();
+
         private readonly Type _anonymousType;
         private readonly ParameterExpression _sourceParameter = Expression.Parameter(typeof(TEntity), "e");
         private readonly ParameterExpression _destinationParameter;
         private readonly Dictionary<string, IMemberValueBinder> _members = new Dictionary<string, IMemberValueBinder>();
         private readonly SubstExpressionVisitor _visitor;
         private readonly Type _queryExecuterType;
+        private readonly IEnumerable<Type> _predicateBuilderTypes;
 
-        public PropertyBinder(Type anonymousType, Type queryExecuterType)
+        public PropertyBinder(Type anonymousType, Type queryExecuterType, IEnumerable<Type> predicateBuilderTypes)
         {
             _anonymousType = anonymousType;
             _destinationParameter = Expression.Parameter(_anonymousType, "e");
             _visitor = new SubstExpressionVisitor(_sourceParameter);
             _queryExecuterType = queryExecuterType;
+            _predicateBuilderTypes = predicateBuilderTypes;
         }
 
         public void Bind<TProperty>(Expression<Func<TEntity, TProperty>> property)
@@ -74,18 +81,23 @@
             }
 
             var init = Expression.MemberInit(@new, bindings);
-            var factory = GetType().GetMethod(nameof(Create), BindingFlags.NonPublic | BindingFlags.Instance);
-            var generic = factory.MakeGenericMethod(_anonymousType);
+            var method = _methodCache.GetOrAdd(_anonymousType, t =>
+            {
+                var factory = GetType().GetMethod(nameof(Create), BindingFlags.NonPublic | BindingFlags.Instance);
+                var generic = factory.MakeGenericMethod(_anonymousType);
+                return new GenericMethodWrapper<IQueryExecuter>(_anonymousType, MethodFactory.CreateGenericMethod<IQueryExecuter>(generic));
 
-            return (IQueryExecuter)generic.Invoke(this, new object[] { init, _sourceParameter, _queryExecuterType });
+            });
+
+            return method.Method(this, new object[] { init, _sourceParameter, _queryExecuterType, _predicateBuilderTypes });
         }
 
         private IQueryExecuter Create<TProjection>(MemberInitExpression memberInit, ParameterExpression parameter,
-            Type queryExecuter)
+            Type queryExecuter, IEnumerable<Type> predicateBuilderTypes)
             where TProjection : class
         {
             var projection = Expression.Lambda<Func<TEntity, TProjection>>(memberInit, parameter);
-            return new DefaultQueryExecuter<TEntity, TProjection>(projection, queryExecuter);
+            return new DefaultQueryExecuter<TEntity, TProjection>(projection, queryExecuter, predicateBuilderTypes);
         }
     }
 }

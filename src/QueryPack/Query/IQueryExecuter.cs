@@ -1,5 +1,6 @@
 ﻿namespace QueryPack.Query
 {
+    using Models;
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
@@ -8,6 +9,7 @@
     public interface IQueryExecutionContext
     {
         IServiceProvider ServiceProvider { get; }
+	    ISearchModel SearchModel { get; }
     }
 
     public interface IQueryExecuter
@@ -17,7 +19,8 @@
 
     public interface IQueryExecuter<TEntity>
     {
-        Task<IEnumerable<TProjection>> ExecuteQueryAsync<TProjection>(Expression<Func<TEntity, TProjection>> projection)
+        Task<IEnumerable<TProjection>> ExecuteQueryAsync<TProjection>(Expression<Func<TEntity, TProjection>> projection,
+            Expression<Func<TEntity, bool>> predicate)
          where TProjection : class;
     }
 }

@@ -160,6 +160,20 @@
             }
         }
 
+        internal class Predicate<TSearch> : IPredicate<TEntity>
+            where TSearch : ISearchModel
+        {
+            private readonly Func<TSearch, Expression<Func<TEntity, bool>>> _delegate;
+
+            public Predicate(Func<TSearch, Expression<Func<TEntity, bool>>> @delegate)
+            {
+                _delegate = @delegate;
+            }
+
+            public Expression<Func<TEntity, bool>> Get(ISearchModel search) 
+                => _delegate((TSearch)search);
+        }
+
         public ICriteriaBuilder<TEntity, TModel> With(Func<TModel, Expression<Func<TEntity, bool>>> predicateFactory,
             Action<IRestriction<TModel>> restriction = default)
         {
@@ -208,7 +222,7 @@
             return first;
         }
 
-        public Expression<Func<TEntity, bool>> Build(TModel model) 
-            => Build(_criterias, model);
+        public IPredicate<TEntity> Build() 
+            => new Predicate<TModel>(m => Build(_criterias, m));
     }
 }

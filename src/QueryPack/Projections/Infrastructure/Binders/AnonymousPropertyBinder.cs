@@ -13,6 +13,7 @@
         private readonly Dictionary<string, IMemberBuilder> _members = new Dictionary<string, IMemberBuilder>();
         private readonly SubstExpressionVisitor _visitor = new SubstExpressionVisitor(Expression.Parameter(typeof(TEntity), "e"));
         private readonly Type _queryExecuterType;
+        private List<Type> _predicateBuilderTypes = new List<Type>();
 
         public AnonymousPropertyBinder(Type queryExecuterType)
         {
@@ -98,6 +99,11 @@
 
         }
 
+        public void AddPredicates(IEnumerable<Type> predicates)
+        {
+             _predicateBuilderTypes.AddRange(predicates);
+        }
+
         public IQueryExecuter GetQueryExecuter()
         {
             var typeBuilder = AnonymousTypeBuilder.GetBuilder();
@@ -107,7 +113,7 @@
             }
 
             var type = typeBuilder.CreateType();
-            var _internalBinder = new PropertyBinder<TEntity>(type, _queryExecuterType);
+            var _internalBinder = new PropertyBinder<TEntity>(type, _queryExecuterType, _predicateBuilderTypes);
 
             foreach (var invoker in _binderInvokers)
                 invoker.Bind(_internalBinder);
